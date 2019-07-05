@@ -8,10 +8,13 @@ from keras.models import load_model
 from fr_utils import *
 from inception_blocks_v2 import *
 from datetime import date
+from gtts import gTTS 
+from pygame import mixer
+import os
 
 detector = dlib.get_frontal_face_detector()
 
-FRmodel = load_model('face-rec_Google.h5')
+FRmodel = load_model('saved_model.h5')
 print("Total Params:", FRmodel.count_params())
 today = str(date.today())
 today=today[-2:]
@@ -37,19 +40,25 @@ def recognize():
             name,status=who_is_it(person, database, FRmodel)
             if(status==1):
             	print('Hi '+name)
+            	myobj = gTTS(text='Hi '+str(name), lang='en',slow=False)
+            	myobj.save("welcome.mp3") 
+            	#os.system("mpg321 welcome.mp3") 
+		#wave.open("/home/dhruv_bansal/Documents/face_recog/welcome.mp3","r")
+		#mixer.init()
+		#mixer.music.load('e:/LOCAL/Betrayer/Metalik Klinik1-Anak Sekolah.mp3')
+		#mixer.music.play()
             elif(status==-1):
             	print('Enter your Name')
             	name=Input()
             	saveName(name,person)
-            print(status)
+            print(name+" "+str(status))
         if cv2.waitKey(1) == ord('q'):
             break
 
 
 
 
-def who_is_it(image, database, model):
-    
+def who_is_it(image, database, model):    
     encoding = img_to_encoding(image, model)    
     min_dist = 100
     identity = None
@@ -61,21 +70,27 @@ def who_is_it(image, database, model):
             identity = name
 
     if identity[-2:]==today:
-    	return ('',0)
-    elif min_dist > 0.52:
+    	return (identity,0)
+    elif min_dist > 0.52:    	
         return (None,-1)
     else:
-        changeName(identity)
-        return (str(identity),1)
+        changeName_Status=changeName(str(identity))
+        if changeName_Status=='Done':
+        	return (str(identity),1)
+        else:
+        	return (str(identity),0)
     
 def changeName(identity):
-    src="/home/dhruv_bansal/Documents/face_recog/images/"
-    os.rename(src+identity+'.jpg', src+identity[:-2]+today+'.jpg')
-    return 'Done'
+	try:
+	    src="/home/dhruv_bansal/Documents/face_recog/images/"
+	    os.rename(src+identity+".jpg", src+identity[:-2]+today+".jpg")
+	    return 'Done'
+	except:
+		return 'Error occured'
 
 def saveName(name,new_img):
     src="/home/dhruv_bansal/Documents/face_recog/images/"
-    cv2.imwrite(src+name+today+'.jpg', new_img)
+    cv2.imwrite(src+name+today+".jpg", new_img)
     return 'Done'
 
 
