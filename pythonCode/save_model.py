@@ -1,6 +1,6 @@
 from fr_utils import *
 from inception_blocks_v2 import *
-print("HI")
+
 
 
 def triplet_loss(y_true, y_pred, alpha=0.3):
