@@ -4,7 +4,7 @@ In this I have used inception model for face embeddings, This project will welco
 # Sample Image's
 
 * ## _Single Person in a frame_
-![](/sample/sample1.png)
+cc
 ![](/sample/sample2.png)
 
 
